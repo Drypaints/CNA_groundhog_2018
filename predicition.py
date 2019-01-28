@@ -1,25 +1,65 @@
 #! /usr/bin/python3
+from math import sqrt
 
-def compute_g(input_temp, input_list, input_average):
+def compute_relative_evo(period = 0, input_list = []):
+    if (len(input_list) > period):
+        try:
+            value = round((input_list[-1] / input_list[-(1 + period)] - 1) * 100)
+            return '{}'.format(value)
+        except (ValueError, FloatingPointError):
+            return "nan"
     return "nan"
 
-def compute_r(input_temp, input_list, last_period_average, period):
+def compute_std_deviation(period = 0, input_list = []):
     if (len(input_list) >= period):
-        return str(((input_temp - last_period_average) / last_period_average) * 100)
+        try:
+            avg = sum(input_list[-period:]) / period
+            std_dev = sqrt(sum(map(lambda x:(x - avg)**2, input_list[-period:])) / period)
+            return '{:.2f}'.format(std_dev)
+        except (ValueError, FloatingPointError, ZeroDivisionError):
+            return "nan"
     return "nan"
 
-def compute_s(input_temp, input_list, input_average):
+def compute_increase_avg(period = 0, input_list = []):
+    if (len(input_list) > period):
+        try:
+            avg_inc = (input_list[-1] - input_list[-(period + 1)]) / period
+            return '{:.2f}'.format(avg_inc)
+        except (ValueError, FloatingPointError, ZeroDivisionError):
+            return "nan"
     return "nan"
+
+def compute_switch_status(period, input_list):
+    if (len(input_list) > period + 1):
+        try:
+            value = round((input_list[-1] / input_list[-(1 + period)] - 1) * 100)
+            prevalue = round((input_list[-2] / input_list[-(2 + period)] - 1) * 100)
+            if (abs(prevalue + value) != abs(prevalue) + abs(value)):
+                return "\ta switch occurs"
+        except (ValueError, FloatingPointError):
+            return ""
+    return ""
+
+
+def display_final():
+    print("OK")
+
+def display_results(period, input_value, input_list):
+    print("g={}\tr={}%\ts={}{}".format(
+    compute_increase_avg(period, input_list),
+    compute_relative_evo(period, input_list),
+    compute_std_deviation(period, input_list),
+    compute_switch_status(period, input_list)))
 
 def groundhog(period):
-    print(period)
-    input_temp = input()
+    input_value = input()
     input_list = []
-    input_average = float
-    last_period_average = float
-    while (input_temp != "STOP"):
-        input_list.append(float(input_temp))
-        input_average = (sum(input_list) / len(input_list))
-        last_period_average = (sum(input_list[period::-1]) / len(input_list[period::-1]))
-        print("g=" + compute_g(float(input_temp), input_list, input_average) + "\tr=" + compute_r(float(input_temp), input_list, last_period_average, period) + "%\ts=" + compute_s(float(input_temp), input_list, input_average))
-        input_temp = input()
+    trend_switch_nb = 0
+    while (input_value != "STOP"):
+        try:
+            input_list.append(float(input_value))
+            display_results(period, input_value, input_list)
+        except ValueError:
+            continue
+        input_value = input()
+    display_final()
