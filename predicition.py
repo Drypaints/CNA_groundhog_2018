@@ -66,6 +66,8 @@ def compute_switch_status(period, input_list):
 
 
 def display_final(pos_list, in_list, period):
+    if (len(in_list) < period):
+        exit(84)
     global tendency_switch
     print("Global tendency switched {} times".format(tendency_switch))
     pos_list = list(map(lambda x : abs(x - .5), pos_list))
@@ -99,9 +101,14 @@ def groundhog(period):
                 bande_basse = mobile_avg_list[-1] - 2 * float(std_dev_list[-1])
                 bande_haute = mobile_avg_list[-1] + 2 * float(std_dev_list[-1])
                 pos_list.append((input_list[-1] - bande_basse) / (bande_haute - bande_basse))
-            except IndexError:
+            except (IndexError, ZeroDivisionError):
                 pass
         except ValueError:
             continue
         input_value = input()
+        try:
+            float(input_value)
+        except ValueError:
+            if (input_value != "STOP"):
+                exit(84)
     display_final(pos_list, input_list, period)
