@@ -8,7 +8,7 @@ def compute_relative_evo(period = 0, input_list = []):
         try:
             value = round((input_list[-1] / input_list[-(1 + period)] - 1) * 100)
             return '{}'.format(value)
-        except (ValueError, FloatingPointError):
+        except (ValueError, FloatingPointError, ZeroDivisionError):
             return "nan"
     return "nan"
 
@@ -60,7 +60,7 @@ def compute_switch_status(period, input_list):
             if (abs(prevalue + value) != abs(prevalue) + abs(value)):
                 tendency_switch += 1
                 return "    a switch occurs"
-        except (ValueError, FloatingPointError):
+        except (ValueError, FloatingPointError, ZeroDivisionError):
             return ""
     return ""
 
