@@ -14,4 +14,3 @@ if __name__ == "__main__":
         display_help()
     else:
         groundhog(int(argv[1]))
-    exit(0)
